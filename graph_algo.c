@@ -2,99 +2,154 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void build_graph_cmd(pgraph g, int sum, int to_add,int arr_nodes[]){
-    deleteGraph_cmd(g);
-    pnode head = (node*) malloc (sizeof(node));
-    g->start=head;
-    pnode p1=head;
-    for (int i=1; i<sum; i++){
-        pnode p2 = (node*) malloc (sizeof(node));
-        p1->next=p2;
-        p1=p1->next;
+void deleteGraph_cmd(pgraph g) {
+    pnode n = g->nodes;
+    while (NULL != n) {
+        delete_node_cmd(g, n->id);
     }
-    int id=arr_nodes[0];
-    for (int j=0; j<to_add; j++){
-        int counter_edges=0;
-        int sum_edges;
-        while(arr_nodes[id+1]!='n'){
-            counter_edges++;
+    pedge e = g->edges;
+    while (NULL != e) {
+        delete_edge_cmd(g, e->src, e->dest);
+    }
+}
+
+void delete_node_cmd(pgraph g, int id) {
+    pnode p = g->nodes;
+    if (p->id == id) {
+        pnode tmp = p->next;
+        free(p);
+        g->nodes = tmp;
+    } else {
+        while (p->next->id != id) {
+            p = p->next;
         }
-        sum_edges=counter_edges/2;
-        insert_node_cmd(g,arr_nodes[id],sum_edges,(arr_nodes+id+1));
-        id=id+counter_edges+1;
+        if (p->id == id) {
+            pnode tmp = p->next;
+            free(p);
+            g->nodes = tmp;
+        }
+    }
+    delete_edges_by_one_par(id,g);
+}
+
+void delete_edge_cmd(pgraph g, int src, int dest) {
+    pedge e = g->edges;
+    if (e->src == src && e->dest == dest) {
+        pedge tmp = e->next;
+        free(e);
+        g->edges = tmp;
+    } else {
+        while (e->next->src != src || e->next->dest != dest) {
+            e = e->next;
+        }
+        if (e->src == src && e->dest == dest) {
+            pedge tmp = e->next;
+            free(e);
+            g->edges = tmp;
+        }
     }
 }
 
-
-void deleteGraph_cmd(pgraph g){
-    pnode start = g->start;
-    while (NULL != start)
-    {
-        delete_node_cmd(g->start->node_num,g);
-    }
+void insert_node_cmd(int id, pgraph g) {
+    pnode p = (node *) malloc(sizeof(node));
+    pnode tmp = g->nodes;
+    g->nodes = p;
+    p->next = tmp;
+    p->id = id;
 }
 
-void delete_node_cmd(int id,pgraph g){
-    pnode s=g->start;
-    for (int i=0; i<g->sum; i++){
-        pedge to_check=s->edges;
-        while(to_check->next!=NULL){
-            if (to_check->next->endpoint==id){
-                pedge tmp=to_check->next;
-                to_check->next=tmp->next;
-                free(tmp);
+void insert_edge_cmd(int src, int dest, int weight, pgraph g) {
+    pedge e = (edge *) malloc(sizeof(edge));
+    pedge tmp = g->edges;
+    g->edges = e;
+    e->next = tmp;
+    e->src = src;
+    e->dest = dest;
+    e->weight = weight;
+}
+
+void build_graph_cmd(graph g, int arr[]) {
+    int index = 0;
+    while (arr[index] != '\0') {
+        int src;
+        if (arr[index] == 'n') {
+            src = arr[index + 1];
+            insert_node_cmd(src, &g);
+            index = index + 2;
+        } else {
+            int dest = arr[index + 1];
+            insert_edge_cmd(src, arr[index], dest, &g);
+            index = index + 2;
+            pnode p = g.nodes;
+            int flag = 0;
+            while (p != NULL) {
+                if (p->id == dest) {
+                    flag = 1;
+                }
+                p = p->next;
+            }
+            if (flag == 0) {
+                insert_node_cmd(dest, &g);
             }
         }
-        s=s->next;
-    }
-
-    pnode p=g->start;
-    while(p->node_num!=id){
-        p=p->next;
-    }
-    pedge e=p->edges;
-    while(e!=NULL){
-        pedge tmp = e;
-        e = e->next;
-        free(tmp);
-    }
-    pnode p2=g->start;
-//    יש מצב ששכחתי לבדוק אם הראשון הוא למחיקה--- מה קורה
-    while(p2->next->node_num!=id){
-        p2=p2->next;
-    }
-    pnode tmp=p2->next;
-    p2->next=tmp->next;
-    free(tmp);
-}
-
-void insert_node_cmd(pgraph g, int id, int sum_edges, int arr[]){
-    pnode p = (node*) malloc (sizeof(node));
-    p->node_num=id;
-    pnode tmp=g->start;
-    g->start=p;
-    p->next=tmp;
-    int j=0;
-    for (int i=0; i<sum_edges; i++){
-        insert_edge_cmd(arr[j],arr[j+1],p->edges);
-        j=j+2;
     }
 }
 
-void insert_edge_cmd(int weight, int endpoint, pedge edges){
-    pedge e = (edge*) malloc (sizeof(edge));
-    e->weight=weight;
-    e->endpoint=endpoint;
-    e->next=NULL;
-    pedge tmp=edges;
-    edges->next=e;
-    e->next=tmp;
-}
-
-void printGraph_cmd(graph g){
-    pnode p=g.start;
-    for (int i = 0; i < g.sum; i++) {
-        printf("node id:, %d, have nothing edges", p->node_num);
+void delete_edges_by_one_par(int id, pgraph g) {
+    pedge current = g->edges; // pointer to current Node
+    pedge prev = g->edges; // pointer to previous Node
+    pedge removal = NULL; // pointer to Node we will remove
+    // go through the entire linkedList
+    while (current != NULL)
+    {
+        int src = current->src;
+        int dest = current->dest;
+        // lower <= data <= upper
+        // See note below on why use Double.compare()
+        if (src==id || dest==id)
+        {
+            removal = current;
+        }
+        // we found a Node to remove
+        if (removal != NULL)
+        {
+            // special case it was the first
+            if (removal == g->edges)
+            {
+                // change first to next
+                g->edges = removal->next;
+            }
+            else
+            {
+                // move removals previous next to removal next
+                prev->next = removal->next;
+            }
+        }
+        // advance the pointers
+        // only change previous if we didn't have a removal
+        if (removal == NULL)
+        {
+            prev = current;
+        }
+        // move current along
+        current = current->next;
+        // detached the removal
+        if (removal != NULL)
+            removal->next = NULL;
+        // reset the removal pointer
+        removal = NULL;
     }
 }
+
+void printGraph_cmd(pgraph g){
+    pnode p=g->nodes;
+    pedge e=g->edges;
+    while (p!=NULL){
+        printf("node id: %d -->",p->id);
+    }
+    while (e!=NULL){
+        printf("edge data: src: %d dest: %d w: %d -->",e->src,e->dest,e->weight);
+    }
+}
+
 
