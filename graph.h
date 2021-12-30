@@ -31,7 +31,7 @@ void graph_free(graph* graph);
 void graph_insertFirst_node(graph* graph, int data);
 void graph_print(const graph* g);
 void graph_insertFirst_edge(graph* graph, int src,int dest, int weight);
-
+int char_to_int(char c);
 
 
 
