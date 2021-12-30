@@ -52,48 +52,26 @@ void delete_edge_cmd(pgraph g, int src, int dest) {
 
 void insert_node_cmd(int id, pgraph g) {
     pnode p = (node *) malloc(sizeof(node));
-    pnode tmp = g->nodes;
-    g->nodes = p;
-    p->next = tmp;
-    p->id = id;
+    if (p) {
+        p->id = id;
+        pnode tmp = g->nodes;
+        g->nodes = p;
+        p->next = tmp;
+    }
 }
 
 void insert_edge_cmd(int src, int dest, int weight, pgraph g) {
     pedge e = (edge *) malloc(sizeof(edge));
-    pedge tmp = g->edges;
-    g->edges = e;
-    e->next = tmp;
     e->src = src;
     e->dest = dest;
     e->weight = weight;
+    pedge tmp = g->edges;
+    g->edges = e;
+    e->next = tmp;
 }
 
-void build_graph_cmd(graph g, int arr[]) {
-    int index = 0;
-    while (arr[index] != '\0') {
-        int src;
-        if (arr[index] == 'n') {
-            src = arr[index + 1];
-            insert_node_cmd(src, &g);
-            index = index + 2;
-        } else {
-            int dest = arr[index + 1];
-            insert_edge_cmd(src, arr[index], dest, &g);
-            index = index + 2;
-            pnode p = g.nodes;
-            int flag = 0;
-            while (p != NULL) {
-                if (p->id == dest) {
-                    flag = 1;
-                }
-                p = p->next;
-            }
-            if (flag == 0) {
-                insert_node_cmd(dest, &g);
-            }
-        }
-    }
-}
+
+
 
 void delete_edges_by_one_par(int id, pgraph g) {
     pedge current = g->edges; // pointer to current Node
@@ -145,11 +123,17 @@ void printGraph_cmd(pgraph g){
     pnode p=g->nodes;
     pedge e=g->edges;
     while (p!=NULL){
-        printf("node id: %d -->",p->id);
+        printf("node id: %d -->\t",p->id);
+        p=p->next;
     }
     while (e!=NULL){
-        printf("edge data: src: %d dest: %d w: %d -->",e->src,e->dest,e->weight);
+        printf("\nedge data: src: %d dest: %d w: %d -->\t",e->src,e->dest,e->weight);
+        e=e->next;
     }
+}
+
+int char_to_int(char c){
+    return c-'0';
 }
 
 

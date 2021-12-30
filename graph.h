@@ -26,9 +26,9 @@ void delete_node_cmd(pgraph g, int id);
 void delete_edge_cmd(pgraph g, int src, int dest);
 void insert_node_cmd(int id, pgraph g);
 void insert_edge_cmd(int src, int dest, int weight, pgraph g);
-void build_graph_cmd(graph g, int arr[]);
 void delete_edges_by_one_par(int id, pgraph g);
 void printGraph_cmd(pgraph g); //for self debug
+int char_to_int(char c);
 
 
 
