@@ -1,11 +1,12 @@
 #ifndef GRAPH_
 #define GRAPH_
-
+#define INFINITY 2147483647;
 struct _graph;
 typedef struct _graph graph;
 
 typedef struct _node {
     int id;
+    int tag;
     struct _node *_next;
 } Node;
 
@@ -52,47 +53,20 @@ void free_node_by_id(graph *g, int id);
 void free_edge_by_id(graph *g, int id);
 
 
+typedef struct _queue_node {
+    int id;
+    struct _queue_node *_next;
+} queue_node;
+
+typedef struct _queue {
+    struct _queue_node *_head_node;
+    int _size;
+}Queue;
 
 
+void queue_insert(Queue *q, int node);
+void queue_pop(Queue *q, int data);
 
 
-
-
-
-
-//typedef struct NODE_ *pnode;
-//
-//typedef struct edge_ {
-//    int weight;
-//    int src;
-//    int dest;
-//    struct edge_ *next;
-//} edge, *pedge;
-//
-//
-//typedef struct NODE_ {
-//    int id;
-//    struct NODE_ *next;
-//} node, *pnode;
-//
-//typedef struct graph_ {
-//    pedge edges;
-//    pnode nodes;
-//} graph, *pgraph;
-//
-//void deleteGraph_cmd(pgraph g);
-//void delete_node_cmd(pgraph g, int id);
-//void delete_edge_cmd(pgraph g, int src, int dest);
-//void insert_node_cmd(int id, pgraph g);
-//void insert_edge_cmd(int src, int dest, int weight, pgraph g);
-//void delete_edges_by_one_par(int id, pgraph g);
-//void printGraph_cmd(pgraph g); //for self debug
-//int char_to_int(char c);
-//
-//
-//
-//
-//void shortsPath_cmd();
-//void TSP_cmd();
 
 #endif
