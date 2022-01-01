@@ -28,7 +28,7 @@ void Edge_free(Edge *edge) {
 }
 
 graph *graph_alloc() {
-    graph *p = (graph *) malloc(sizeof(Node));
+    graph *p = (graph *) malloc(sizeof(Queue));
     p->_head_node = NULL;
     p->_size = 0;
     return p;
@@ -101,18 +101,17 @@ void free_edge_by_src(graph *g, int src) {
             if (current == g->_head_edge) {
                 g->_head_edge = current->_next;
                 removal = current;
-                current=current->_next;
+                current = current->_next;
                 free(removal);
-                removal= NULL;
+                removal = NULL;
             } else {
                 prev->_next = current->_next;
                 removal = current;
-                current=current->_next;
+                current = current->_next;
                 free(removal);
-                removal= NULL;
+                removal = NULL;
             }
-        }
-        else {
+        } else {
             prev = current;
             current = current->_next;
         }
@@ -125,7 +124,7 @@ void free_node_by_id(graph *g, int id) {
     if (p1->id == id) {
         g->_head_node = g->_head_node->_next;
         free(p1);
-        g->_size=g->_size-1;
+        g->_size = g->_size - 1;
     } else {
         while (p1->id != id) {
             prev = p1;
@@ -133,7 +132,7 @@ void free_node_by_id(graph *g, int id) {
         }
         prev->_next = p1->_next;
         free(p1);
-        g->_size=g->_size-1;
+        g->_size = g->_size - 1;
     }
 }
 
@@ -146,25 +145,31 @@ void free_edge_by_id(graph *g, int id) {
             if (current == g->_head_edge) {
                 g->_head_edge = current->_next;
                 removal = current;
-                current=current->_next;
+                current = current->_next;
                 free(removal);
-                removal=NULL;
+                removal = NULL;
             } else {
                 prev->_next = current->_next;
                 removal = current;
-                current=current->_next;
+                current = current->_next;
                 free(removal);
-                removal=NULL;
+                removal = NULL;
             }
-        }
-        else {
+        } else {
             prev = current;
             current = current->_next;
         }
     }
 }
 
-Node *queue_node_alloc(int data, queue_node *next) {
+Queue *queue_alloc() {
+    Queue *p = (Queue *) malloc(sizeof(Queue));
+    p->_head_node = NULL;
+    p->_size = 0;
+    return p;
+}
+
+queue_node *queue_node_alloc(int data, queue_node *next) {
     queue_node *p = (queue_node *) malloc(sizeof(queue_node));
     p->id = data;
     p->_next = next;
@@ -175,20 +180,66 @@ void queue_insert_first(Queue *q, int data) {
     q->_head_node = queue_node_alloc(data, q->_head_node);
     ++(q->_size);
 }
-void queue_pop_last(Queue *q, int data) {
-//    delete him from the queue and return his pointer- i must do the pop on the last element of the queue
+
+int queue_pop_last(Queue *q) {
+    queue_node *p = q->_head_node;
+    while (p->_next != NULL) {
+        p = p->_next;
+    }
+    int id = p->id;
+    free(p);
+    p = NULL;
+    return id;
 }
 
-//int shortestPathDist(int src, int dest) {
-//    if (src == dest) {
-//        return 0;
-//    }
-//    return calculateShortestPath(src);
-//}
-//
-//void calculateShortestPath(int src) {
-//
-//}
+int shortestPathDist(graph *g, int src, int dest) {
+    if (src == dest) {
+        return 0;
+    }
+    Queue *to_visit = queue_alloc();
+//    Queue *visited = queue_alloc();
+    queue_insert_first(to_visit, src);
+    Node *p = g->_head_node;
+    while (p->id != src) {
+        p = p->_next;
+    }
+    p->tag = 0;
+    while (to_visit->_size > 0) {
+        int to_check = queue_pop_last(to_visit);
+//        queue_insert_first(visited, to_check);
+        Node *p2 = g->_head_node;
+        while (p2->id != to_check) {
+            p2 = p2->_next;
+        }
+        int tag = p2->tag;
+        Edge *e = g->_head_edge;
+        while (e->_next != NULL) {
+            if (e->src == to_check) {
+                queue_insert_first(to_visit, e->dest);
+                int w = e->weight;
+                Node *p3 = g->_head_node;
+                while (p3->id != e->dest) {
+                    p3 = p3->_next;
+                }
+                if (w + tag < p3->tag) {
+                    p3->tag = w + tag;
+                }
+            }
+            e = e->_next;
+        }
+
+    }
+    free(to_visit);
+    Node *p4 = g->_head_node;
+    while (p4->id != dest) {
+        p4 = p4->_next;
+    }
+    if (p4->tag==INFINITY){
+        return -1;
+    }
+    return p4->tag;
+}
+
 
 
 

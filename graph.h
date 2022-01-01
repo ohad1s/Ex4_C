@@ -1,6 +1,6 @@
 #ifndef GRAPH_
 #define GRAPH_
-#define INFINITY 2147483647;
+#define INFINITY 2147483647
 struct _graph;
 typedef struct _graph graph;
 
@@ -63,10 +63,12 @@ typedef struct _queue {
     int _size;
 }Queue;
 
+Queue *queue_alloc();
+queue_node *queue_node_alloc(int data, queue_node *next);
+void queue_insert_first(Queue *q, int data);
+int queue_pop_last(Queue *q);
 
-void queue_insert(Queue *q, int node);
-void queue_pop(Queue *q, int data);
-
+int shortestPathDist(graph *g, int src, int dest);
 
 
 #endif
