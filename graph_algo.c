@@ -178,21 +178,31 @@ queue_node *queue_node_alloc(int data, queue_node *next) {
 
 void queue_insert_first(Queue *q, int data) {
     q->_head_node = queue_node_alloc(data, q->_head_node);
-    ++(q->_size);
+    (q->_size=q->_size+1);
 }
 
 int queue_pop_last(Queue *q) {
+    printf("im in pop last func\n");
+//    queue_print(q);
+    queue_node *prev=q->_head_node;
     queue_node *p = q->_head_node;
     while (p->_next != NULL) {
+//        printf("prev is: %d", prev->id);
+//        printf("curr is: %d", p->id);
+        prev=p;
         p = p->_next;
+//        printf("but why???\n");
     }
     int id = p->id;
     free(p);
-    p = NULL;
+    printf("free from func\n");
+    prev->_next=NULL;
+    printf("id to pop from the function: %d\n",id);
     return id;
 }
 
 int shortestPathDist(graph *g, int src, int dest) {
+    printf("im in\n");
     if (src == dest) {
         return 0;
     }
@@ -201,11 +211,15 @@ int shortestPathDist(graph *g, int src, int dest) {
     queue_insert_first(to_visit, src);
     Node *p = g->_head_node;
     while (p->id != src) {
+        printf("found\n");
         p = p->_next;
     }
     p->tag = 0;
-    while (to_visit->_size > 0) {
+    while (to_visit->_head_node!=NULL) {
+//        queue_print(to_visit);
+        printf("call in big while\n");
         int to_check = queue_pop_last(to_visit);
+        printf("poped: %d\n",to_check);
 //        queue_insert_first(visited, to_check);
         Node *p2 = g->_head_node;
         while (p2->id != to_check) {
@@ -213,9 +227,10 @@ int shortestPathDist(graph *g, int src, int dest) {
         }
         int tag = p2->tag;
         Edge *e = g->_head_edge;
-        while (e->_next != NULL) {
+        while (e!= NULL) {
             if (e->src == to_check) {
                 queue_insert_first(to_visit, e->dest);
+                printf("insert: %d\n",e->dest);
                 int w = e->weight;
                 Node *p3 = g->_head_node;
                 while (p3->id != e->dest) {
@@ -225,11 +240,13 @@ int shortestPathDist(graph *g, int src, int dest) {
                     p3->tag = w + tag;
                 }
             }
+            printf("++next edge\n");
             e = e->_next;
         }
 
     }
     free(to_visit);
+    printf("out of big while- to visit free\n");
     Node *p4 = g->_head_node;
     while (p4->id != dest) {
         p4 = p4->_next;
@@ -241,5 +258,12 @@ int shortestPathDist(graph *g, int src, int dest) {
 }
 
 
-
+void queue_print(const Queue *q) {
+    const queue_node *p = q->_head_node;
+    while (p!= NULL) {
+        printf("(%d)->", p->id);
+        p = p->_next;
+    }
+    printf("\t%d\n", q->_size);
+}
 

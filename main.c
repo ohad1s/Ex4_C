@@ -4,6 +4,21 @@
 
 int main() {
     printf("Hello World\n");
+//    Queue *q=queue_alloc();
+//    queue_insert_first(q,1);
+//    queue_insert_first(q,2);
+//    queue_insert_first(q,3);
+//    queue_print(q);
+//    queue_pop_last(q);
+//    queue_print(q);
+//    queue_pop_last(q);
+//    queue_print(q);
+//    queue_pop_last(q);
+//    queue_print(q);
+
+
+
+
     graph *my_graph = graph_alloc();
 
     graph_insertFirst_node(my_graph, 0);

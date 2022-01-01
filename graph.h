@@ -70,5 +70,7 @@ int queue_pop_last(Queue *q);
 
 int shortestPathDist(graph *g, int src, int dest);
 
+void queue_print(const Queue *q);
+
 
 #endif
